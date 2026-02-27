@@ -28,11 +28,25 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const jwt = await this.authService.generateJwt(req.user as User);
+    try {
+      if (!req.user) {
+        throw new Error('No user found after Google authentication');
+      }
 
-    // Redirect to frontend with token
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    res.redirect(`${frontendUrl}/auth/callback?token=${jwt.access_token}`);
+      const jwt = await this.authService.generateJwt(req.user as User);
+
+      // Redirect to frontend with token
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+      const redirectUrl = `${frontendUrl}?token=${jwt.access_token}`;
+
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Google callback error:', error);
+      res.status(500).json({
+        statusCode: 500,
+        message: `OAuth callback failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
   }
 
   @Post('apple')
@@ -46,11 +60,23 @@ export class AuthController {
   @UseGuards(AppleAuthGuard)
   @ApiOperation({ summary: 'Apple OAuth callback' })
   async appleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const jwt = await this.authService.generateJwt(req.user as User);
+    try {
+      if (!req.user) {
+        throw new Error('No user found after Apple authentication');
+      }
 
-    // Redirect to frontend with token
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    res.redirect(`${frontendUrl}/auth/callback?token=${jwt.access_token}`);
+      const jwt = await this.authService.generateJwt(req.user as User);
+
+      // Redirect to frontend with token
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+      res.redirect(`${frontendUrl}?token=${jwt.access_token}`);
+    } catch (error) {
+      console.error('Apple callback error:', error);
+      res.status(500).json({
+        statusCode: 500,
+        message: `OAuth callback failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
   }
 
   @Get('profile')

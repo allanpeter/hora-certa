@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuthStore } from './stores/auth.store';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -12,24 +13,34 @@ import { LoyaltyPage } from './pages/LoyaltyPage';
 // Create a client for React Query
 const queryClient = new QueryClient();
 
+// Extract token from URL BEFORE React Router processes it
+function extractTokenFromUrl() {
+  if (typeof window === 'undefined') return;
+
+  const search = window.location.search;
+
+  if (search) {
+    const params = new URLSearchParams(search);
+    const token = params.get('token');
+
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+  }
+}
+
+// Call this immediately when the app loads
+extractTokenFromUrl();
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<OAuthCallbackHandler />} />
 
           {/* Protected Routes with Layout */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/dashboard"
             element={
@@ -98,6 +109,27 @@ function App() {
   );
 }
 
+function OAuthCallbackHandler() {
+  const token = useAuthStore((state) => state.token);
+  const setToken = useAuthStore((state) => state.setToken);
+
+  // Sync localStorage token with Zustand store
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken && !token) {
+      setToken(storedToken);
+    }
+  }, [token, setToken]);
+
+  // If we have a token, go to dashboard
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // No token, redirect to login
+  return <Navigate to="/login" replace />;
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((state) => state.token);
 
@@ -111,9 +143,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function LoginPage() {
   const token = useAuthStore((state) => state.token);
 
+  // If user is already logged in, redirect to dashboard
   if (token) {
     return <Navigate to="/dashboard" replace />;
   }
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:3001/auth/google';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
@@ -130,7 +167,7 @@ function LoginPage() {
               Use sua conta Google para acessar a plataforma
             </p>
 
-            <button className="w-full bg-white text-gray-900 py-3 rounded-lg font-semibold hover:bg-gray-100 transition mb-4">
+            <button onClick={handleGoogleLogin} className="w-full bg-white text-gray-900 py-3 rounded-lg font-semibold hover:bg-gray-100 transition mb-4">
               Continuar com Google
             </button>
 

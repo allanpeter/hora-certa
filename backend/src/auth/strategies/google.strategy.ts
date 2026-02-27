@@ -23,14 +23,26 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     _refreshToken: string,
     profile: any,
   ): Promise<any> {
-    const { id, name, emails, photos } = profile;
+    const { id, name, emails, photos, displayName } = profile;
+
+    // Handle edge cases where profile fields might be missing
+    const email = emails?.[0]?.value || profile.email || '';
+    const fullName = displayName ||
+      (name ? `${name.givenName || ''} ${name.familyName || ''}`.trim() : '') ||
+      'Google User';
+    const avatar = photos?.[0]?.value || undefined;
+    const emailVerified = emails?.[0]?.verified || false;
+
+    if (!email) {
+      throw new Error('No email found in Google profile');
+    }
 
     const user = await this.authService.validateOAuthUser({
       google_id: id,
-      email: emails[0].value,
-      name: `${name.givenName} ${name.familyName}`,
-      avatar_url: photos[0]?.value,
-      email_verified: emails[0].verified,
+      email,
+      name: fullName,
+      avatar_url: avatar,
+      email_verified: emailVerified,
     });
 
     return user;
