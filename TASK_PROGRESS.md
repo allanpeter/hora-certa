@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 26, 2026
-**Project Status**: MVP Phase 1 - Foundation
-**Overall Completion**: 13% (2 of 15 tasks)
+**Last Updated**: Feb 26, 2026 - Evening
+**Project Status**: MVP Phase 1 - Foundation (User Auth Complete)
+**Overall Completion**: 20% (3 of 15 tasks)
 
 ---
 
@@ -25,7 +25,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 ## 📈 Completion Overview
 
 ```
-[█████░░░░░░░░░░░░░░░] 13% (2/15 tasks completed)
+[███████░░░░░░░░░░░░░] 20% (3/15 tasks completed)
 ```
 
 | Phase | Status | Duration |
@@ -39,7 +39,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ## 📋 Detailed Task Breakdown
 
-### ✅ **COMPLETED (2/15)**
+### ✅ **COMPLETED (3/15)**
 
 #### Task #1: Set up project structure and dependencies
 - **Status**: ✅ COMPLETED
@@ -95,26 +95,41 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ---
 
-### ⏳ **PENDING (13/15)**
+### ⏳ **PENDING (12/15)**
 
 ---
 
 #### Task #3: Implement Google and Apple OAuth SSO
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED (Google) / ⏳ PENDING (Apple)
+- **Completed Date**: Feb 26, 2026
+- **Duration**: 1 session
 - **Priority**: HIGH (blocks user flow)
 - **Dependencies**: Task #2
-- **Estimated Duration**: 2-3 hours
-- **What needs to be done**:
-  - Set up Passport.js with Google strategy
-  - Set up Passport.js with Apple strategy
-  - Create auth service and auth controller
-  - Implement JWT token generation
-  - Add auth guards for protected routes
-  - Create auth DTOs for validation
-  - Test OAuth flow end-to-end
-- **Packages**: `@nestjs/passport`, `passport-google-oauth20`, `@nestjs/jwt`
+- **What was done**:
+  - ✅ Set up Passport.js with Google strategy
+  - ✅ Created auth service and auth controller
+  - ✅ Implemented JWT token generation (7-day expiration)
+  - ✅ Added auth guards for protected routes (JwtAuthGuard, GoogleAuthGuard)
+  - ✅ Created auth DTOs for validation
+  - ✅ Enhanced User entity with `google_id` and `email_verified` fields
+  - ✅ Created database migration for OAuth fields
+  - ✅ Set up environment configuration (.env)
+  - ✅ Comprehensive documentation and quick-start guides
+  - ⏳ Set up Passport.js with Apple strategy (TODO - future)
+- **Packages Used**: `@nestjs/passport`, `passport-google-oauth20`, `@nestjs/jwt`
+- **Artifacts**:
+  - `backend/src/auth/` - Core auth module (9 files, 221 lines)
+  - `backend/src/database/migrations/1704081600001-AddOAuthFieldsToUser.ts`
+  - `backend/.env` - OAuth configuration template
+  - `AUTH_IMPLEMENTATION.md` - Technical documentation
+  - `QUICK_START_AUTH.md` - Quick start guide
+  - `IMPLEMENTATION_SUMMARY.md` - Overview
+- **API Endpoints**:
+  - `GET /auth/google` - Initiate OAuth flow
+  - `GET /auth/google/callback` - OAuth callback handler
+  - `GET /auth/profile` - Get current user (protected)
 - **Reference**: [PRD.md Section 2.1.8](./PRD.md#218-authentication--security-multi-tenant)
-- **Blockers**: Need Google/Apple credentials (set in .env)
+- **Next**: Apple OAuth strategy (similar pattern)
 
 ---
 
@@ -565,8 +580,9 @@ docker-compose logs -f postgres
 | Task | Blocks | Status |
 |------|--------|--------|
 | #2 Database Schema | All tasks | ✅ COMPLETE |
-| #3 OAuth | User creation | ⏳ NEXT |
-| #5 Services | Appointment booking | ⏳ After #3 |
+| #3 OAuth (Google) | User creation | ✅ COMPLETE |
+| #4 User Profiles | Services management | ⏳ NEXT |
+| #5 Services | Appointment booking | ⏳ After #4 |
 | #6 Calendar | Appointment booking | ⏳ After #5 |
 | #7 Booking | Payment, Reminders | ⏳ After #6 |
 | #8 Payment | MVP launch | ⏳ High priority |
@@ -628,14 +644,15 @@ docker-compose logs -f postgres
 |------|---------|-----------|-------|
 | Feb 26, 2026 | 1 | Task #1 | Project structure + monorepo setup |
 | Feb 26, 2026 | 2 | Task #2 | Database schema: 12 entities, 8 enums, 1 migration |
-| - | 3 | Task #3 | OAuth authentication |
+| Feb 26, 2026 | 3 | Task #3 | Google OAuth authentication (Apple SSO: TODO) |
+| - | 4 | Task #4 | User profile management |
 | - | ... | ... | Continue with remaining tasks |
 
 ---
 
-**Last working session**: Feb 26, 2026
-**Next task**: Task #3 - OAuth Authentication
-**Estimated time for next task**: 2-3 hours
+**Last working session**: Feb 26, 2026 (Evening)
+**Next task**: Task #4 - User Profile Management (or Task #3 Part 2 - Apple OAuth)
+**Estimated time for next task**: 2-3 hours (Task #4) or 1-2 hours (Apple SSO)
 
 ---
 

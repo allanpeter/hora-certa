@@ -22,4 +22,10 @@ export class User extends BaseEntity {
 
   @Column({ type: 'enum', enum: UserType })
   user_type: UserType;
+
+  @Column({ nullable: true, unique: true })
+  google_id: string;
+
+  @Column({ default: false })
+  email_verified: boolean;
 }
