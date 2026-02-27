@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 27, 2026 - Late Morning
-**Project Status**: MVP Phase 1 - Foundation (Auth + Profiles + Services Complete)
-**Overall Completion**: 33% (5 of 15 tasks) - Core Features Emerging
+**Last Updated**: Feb 27, 2026 - Afternoon
+**Project Status**: MVP Phase 1 - Foundation (Auth + Profiles + Services + Calendar Complete)
+**Overall Completion**: 40% (6 of 15 tasks) - Major Features Completed
 
 ---
 
@@ -25,7 +25,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 ## 📈 Completion Overview
 
 ```
-[█████████████░░░░░░░] 33% (5/15 tasks completed)
+[████████████████░░░░] 40% (6/15 tasks completed)
 ```
 
 | Phase | Status | Duration |
@@ -39,7 +39,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ## 📋 Detailed Task Breakdown
 
-### ✅ **COMPLETED (5/15)**
+### ✅ **COMPLETED (6/15)**
 
 #### Task #1: Set up project structure and dependencies
 - **Status**: ✅ COMPLETED
@@ -95,7 +95,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ---
 
-### ⏳ **PENDING (10/15)**
+### ⏳ **PENDING (9/15)**
 
 ---
 
@@ -266,28 +266,58 @@ See [PRD.md](./PRD.md) for complete specifications.
 ---
 
 #### Task #6: Implement calendar and availability system
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED
+- **Completed Date**: Feb 27, 2026
+- **Duration**: 1 session
 - **Priority**: HIGH (core feature)
 - **Dependencies**: Task #2, Task #5
-- **Estimated Duration**: 3-4 hours
-- **What needs to be done**:
-  - Create barber working hours configuration
-  - Implement availability calculation logic
-  - Add day/week/month view support
-  - Create slot generation algorithm
-  - Handle breaks and lunch hours
-  - Implement vacation/time-off management
-  - Add available slots endpoint
-- **Logic**: Calculate available slots based on:
-  - Barber working hours
-  - Service duration
-  - Existing appointments
-  - Buffer time between appointments
-- **Endpoints**:
-  - `GET /api/barbers/:id/availability?date=YYYY-MM-DD`
-  - `GET /api/barbers/:id/working-hours`
-  - `PATCH /api/barbers/:id/working-hours`
-  - `GET /api/slots?barber_id=&service_id=&date=`
+- **What was done**:
+  - ✅ Created AvailabilityService with slot calculation logic
+  - ✅ Implemented working hours configuration per day
+  - ✅ Created slot generation algorithm (30-minute intervals)
+  - ✅ Added lunch break support with start/end times
+  - ✅ Implemented buffer time (15 minutes between appointments)
+  - ✅ Added conflict detection with existing appointments
+  - ✅ Created AvailabilityController with REST endpoints
+  - ✅ Implemented slot filtering by date and service duration
+  - ✅ Multi-day week configuration support
+  - ✅ Time conversion utilities (minutes to datetime)
+  - ✅ AppointmentStatus filtering (SCHEDULED, CONFIRMED only)
+  - ✅ Swagger documentation
+  - ✅ Type-safe DTOs
+  - ✅ Error handling
+- **Artifacts**:
+  - `backend/src/availability/` - Availability module (4 files, 282 lines)
+  - `backend/src/availability/availability.service.ts` - Slot calculation (150 lines)
+  - `backend/src/availability/availability.controller.ts` - HTTP endpoints (60 lines)
+  - `backend/src/availability/availability.module.ts` - Module config (12 lines)
+  - `backend/src/availability/dto/working-hours.dto.ts` - DTOs (60 lines)
+  - `AVAILABILITY_CALENDAR_GUIDE.md` - Complete documentation
+- **API Endpoints**:
+  - `PATCH /availability/barbers/:barberId/working-hours` - Update hours (JWT protected)
+  - `GET /availability/slots` - Get available slots (JWT protected)
+    - Query params: date (YYYY-MM-DD), barberId, serviceDuration
+- **Features**:
+  - ✅ Per-day working hours (start_hour, start_minute, end_hour, end_minute)
+  - ✅ Optional lunch break configuration
+  - ✅ Closed days support (null/undefined)
+  - ✅ 30-minute slot intervals
+  - ✅ Service duration-based slot calculation
+  - ✅ 15-minute buffer time between appointments
+  - ✅ Lunch break handling (skip slots during lunch)
+  - ✅ Existing appointment conflict detection
+  - ✅ SCHEDULED and CONFIRMED status filtering
+  - ✅ Invalid date format validation
+- **Database**:
+  - Uses existing Barber entity with working_hours JSONB field
+  - Uses existing Appointment entity with scheduled_start/end timestamps
+  - No schema changes needed
+- **Availability Logic**:
+  - Get working hours for day of week
+  - Generate 30-minute slots from start to end time
+  - Skip lunch break periods
+  - Skip slots conflicting with existing appointments (+ 15min buffer)
+  - Return available slots in ISO 8601 format
 - **Reference**: [PRD.md Section 2.1.2](./PRD.md#212-schedule-management---core)
 
 ---
@@ -739,13 +769,14 @@ docker-compose logs -f postgres
 | Feb 26, 2026 | 3b | Task #3 | Apple OAuth authentication (Session 2) - COMPLETE ✅ |
 | Feb 27, 2026 | 4 | Task #4 | User profile management (GET/PATCH endpoints) - COMPLETE ✅ |
 | Feb 27, 2026 | 5 | Task #5 | Barber service management (CRUD + filtering) - COMPLETE ✅ |
-| - | 6 | Task #6 | Calendar and availability system |
+| Feb 27, 2026 | 6 | Task #6 | Calendar and availability system (slots + working hours) - COMPLETE ✅ |
+| - | 7 | Task #7 | Appointment booking system |
 | - | ... | ... | Continue with remaining tasks |
 
 ---
 
-**Last working session**: Feb 27, 2026 (Late Morning - Barber Services)
-**Next task**: Task #6 - Calendar and Availability System
+**Last working session**: Feb 27, 2026 (Afternoon - Calendar & Availability)
+**Next task**: Task #7 - Appointment Booking System
 **Estimated time for next task**: 3-4 hours
 
 ---
