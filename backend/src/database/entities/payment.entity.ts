@@ -3,6 +3,7 @@ import { TenantBaseEntity } from '../base/tenant-base.entity';
 import { PaymentStatus, PaymentMethod } from '../../common/enums';
 import { Tenant } from './tenant.entity';
 import { Customer } from './customer.entity';
+import { Appointment } from './appointment.entity';
 
 @Entity('payments')
 export class Payment extends TenantBaseEntity {
@@ -45,6 +46,15 @@ export class Payment extends TenantBaseEntity {
   @Column({ nullable: true })
   receipt_url: string;
 
+  @Column({ nullable: true })
+  external_id: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  paid_at: Date;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata: Record<string, any>;
+
   // Relations
   @ManyToOne(() => Tenant)
   @JoinColumn({ name: 'tenant_id' })
@@ -53,4 +63,8 @@ export class Payment extends TenantBaseEntity {
   @ManyToOne(() => Customer)
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
+
+  @ManyToOne(() => Appointment, { nullable: true })
+  @JoinColumn({ name: 'appointment_id' })
+  appointment: Appointment;
 }
