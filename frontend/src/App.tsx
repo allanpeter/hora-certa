@@ -1,8 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/auth.store';
+import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { BarberDashboard } from './pages/BarberDashboard';
+import { BookingPage } from './pages/BookingPage';
+import { AppointmentsPage } from './pages/AppointmentsPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { LoyaltyPage } from './pages/LoyaltyPage';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -12,10 +17,80 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/barber-dashboard" element={<ProtectedRoute><BarberDashboard /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Routes with Layout */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/barber-dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <BarberDashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <AppointmentsPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SettingsPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/loyalty"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <LoyaltyPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Public Booking Page */}
+          <Route
+            path="/book"
+            element={
+              <Layout>
+                <BookingPage />
+              </Layout>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
