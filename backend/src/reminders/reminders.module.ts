@@ -18,6 +18,6 @@ import { EmailService } from './email.service';
   ],
   controllers: [RemindersController],
   providers: [RemindersService, RemindersProcessor, EmailService],
-  exports: [RemindersService],
+  exports: [RemindersService, EmailService],
 })
 export class RemindersModule {}
