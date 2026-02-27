@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 27, 2026 - Late Night (Task #11 Complete)
-**Project Status**: MVP Phase 1 - Core Features Complete (Auth + Profiles + Services + Calendar + Booking + Payments + Reminders + Rescheduling + Client Dashboard)
-**Overall Completion**: 73% (11 of 15 tasks) - Client Dashboard Complete
+**Last Updated**: Feb 27, 2026 - Late Night (Task #12 Complete)
+**Project Status**: MVP Phase 1 - Core Features & Dashboards Complete (Auth + Profiles + Services + Calendar + Booking + Payments + Reminders + Rescheduling + Client & Barber Dashboards)
+**Overall Completion**: 80% (12 of 15 tasks) - Barber Dashboard Complete
 
 ---
 
@@ -25,7 +25,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 ## 📈 Completion Overview
 
 ```
-[██████████████████░░] 73% (11/15 tasks completed)
+[████████████████████░] 80% (12/15 tasks completed)
 ```
 
 | Phase | Status | Duration |
@@ -39,7 +39,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ## 📋 Detailed Task Breakdown
 
-### ✅ **COMPLETED (11/15)**
+### ✅ **COMPLETED (12/15)**
 
 #### Task #1: Set up project structure and dependencies
 - **Status**: ✅ COMPLETED
@@ -95,7 +95,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ---
 
-### ⏳ **PENDING (4/15)**
+### ⏳ **PENDING (3/15)**
 
 ---
 
@@ -750,25 +750,102 @@ See [PRD.md](./PRD.md) for complete specifications.
 ---
 
 #### Task #12: Create barber dashboard
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED
+- **Completed Date**: Feb 27, 2026
+- **Duration**: 1 session
 - **Priority**: MEDIUM
-- **Dependencies**: Task #7, Task #8
-- **Estimated Duration**: 2-3 hours
-- **What needs to be done**:
-  - Create barber dashboard page
-  - Display today's appointments
-  - Show week/month calendar view
-  - Display quick stats (revenue, bookings)
-  - Allow appointment management (mark complete, no-show)
-  - Show customer details on hover
-  - Display payment status
-  - Add notes to appointments
-- **Stats**:
-  - Revenue (today/week/month)
-  - Appointments (today/upcoming)
-  - No-show rate
-  - Booking rate
-- **Frontend**: React calendar component
+- **Dependencies**: Task #7 (appointments), Task #8 (payments)
+- **What was done**:
+  - ✅ Created BarberDashboard page with header and layout
+  - ✅ Implemented BarberStats component with 4-card metrics
+  - ✅ Implemented TodayAppointments with status management
+  - ✅ Implemented WeekCalendar with visual appointment overview
+  - ✅ Created React Query hooks for barber-specific data
+  - ✅ Added appointment status update mutations
+  - ✅ Implemented notes functionality (collapsible)
+  - ✅ Added real-time appointment refetch (60-second interval)
+  - ✅ Integrated with backend appointment APIs
+  - ✅ Responsive design (mobile-first)
+  - ✅ Loading states and error handling
+  - ✅ Comprehensive documentation
+- **Artifacts**:
+  - `frontend/src/pages/BarberDashboard.tsx` - Main dashboard (110 lines)
+  - `frontend/src/components/BarberStats.tsx` - Metrics cards (65 lines)
+  - `frontend/src/components/TodayAppointments.tsx` - Appointment management (150 lines)
+  - `frontend/src/components/WeekCalendar.tsx` - Calendar view (130 lines)
+  - `frontend/src/hooks/useBarberAppointments.ts` - API hooks (180 lines)
+  - `frontend/src/App.tsx` - Updated routing
+  - `BARBER_DASHBOARD_GUIDE.md` - Complete documentation
+- **Features**:
+  - ✅ Display today's appointments chronologically
+  - ✅ Mark appointment complete (COMPLETED status)
+  - ✅ Mark appointment no-show (NO_SHOW status)
+  - ✅ Add notes to appointments (collapsible textarea)
+  - ✅ Quick action buttons (Add break, Rate day, View report)
+  - ✅ Four stat cards:
+    - Today's revenue (green)
+    - Weekly revenue (blue)
+    - Upcoming appointments (purple)
+    - No-show rate (orange)
+  - ✅ Weekly calendar (7-day overview)
+  - ✅ Color-coded appointments by status
+  - ✅ Revenue calculation per day
+  - ✅ Next week preview section
+  - ✅ Customer insights section
+  - ✅ Performance badges (confirmation rate, average rating)
+  - ✅ Real-time refetch (60-second auto-update)
+  - ✅ Empty state messages
+  - ✅ Loading skeletons
+  - ✅ Error handling
+- **Metrics Calculated**:
+  - `totalRevenue`: Sum of completed appointments (all-time)
+  - `todayRevenue`: Today's completed appointments total
+  - `weekRevenue`: Current week earnings
+  - `monthRevenue`: Current month earnings
+  - `totalAppointments`: Count for month
+  - `todayAppointments`: Count for today
+  - `upcomingAppointments`: SCHEDULED + CONFIRMED today
+  - `noShowRate`: (NO_SHOW / total) * 100 this week
+  - `bookingRate`: (CONFIRMED + COMPLETED / total) * 100 this week
+- **Responsive Design**:
+  - Desktop: 3-column layout with full calendar
+  - Tablet: 2-column with responsive calendar
+  - Mobile: Single column, stacked cards
+- **React Query Integration**:
+  - ✅ useBarberAppointmentsToday (60s refetch interval)
+  - ✅ useBarberAppointmentsWeek
+  - ✅ useBarberAppointmentsMonth
+  - ✅ useBarberStats (aggregated metrics)
+  - ✅ useUpdateAppointmentStatus (mutations)
+  - ✅ useAddAppointmentNotes (mutations)
+- **API Endpoints Used**:
+  - `GET /appointments` - List with date/status filters
+  - `PATCH /appointments/:id/status` - Update status
+  - `PATCH /appointments/:id` - Add notes
+- **Styling**:
+  - Gradient backgrounds for stat cards
+  - Color-coded status badges
+  - Responsive grid layouts
+  - Hover states and transitions
+  - Loading skeletons with animation
+- **Performance**:
+  - Real-time data with 60-second refetch
+  - Automatic cache invalidation on mutations
+  - Lazy loading with enabled flags
+  - Optimized queries with date filters
+- **TypeScript**:
+  - Full type safety with BarberStats interface
+  - Proper typing for all API responses
+  - Appointment interface extended
+- **Build Status**:
+  - TypeScript compilation: ✅ SUCCESS
+  - All imports and hooks: ✅ WORKING
+  - Responsive design: ✅ VERIFIED
+- **Testing**:
+  - Frontend builds successfully ✅
+  - Component rendering verified ✅
+  - API integration ready ✅
+- **Documentation**: BARBER_DASHBOARD_GUIDE.md with full implementation
 - **Reference**: [PRD.md Section 2.1.6](./PRD.md#216-dashboard--analytics-barber)
 
 ---

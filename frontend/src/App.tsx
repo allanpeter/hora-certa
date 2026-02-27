@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/auth.store';
 import { Dashboard } from './pages/Dashboard';
+import { BarberDashboard } from './pages/BarberDashboard';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/barber-dashboard" element={<ProtectedRoute><BarberDashboard /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
