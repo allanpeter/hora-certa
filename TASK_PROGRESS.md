@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 27, 2026 - Night
-**Project Status**: MVP Phase 1 - Foundation (All Core Features Complete - Auth + Profiles + Services + Calendar + Booking + Payments + Reminders)
-**Overall Completion**: 60% (9 of 15 tasks) - Reminder System Complete
+**Last Updated**: Feb 27, 2026 - Late Night
+**Project Status**: MVP Phase 1 - Core Features Complete (Auth + Profiles + Services + Calendar + Booking + Payments + Reminders + Rescheduling)
+**Overall Completion**: 67% (10 of 15 tasks) - Auto-Rescheduling System Complete
 
 ---
 
@@ -25,7 +25,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 ## 📈 Completion Overview
 
 ```
-[███████████████████░] 60% (9/15 tasks completed)
+[██████████████████░░] 67% (10/15 tasks completed)
 ```
 
 | Phase | Status | Duration |
@@ -39,7 +39,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ## 📋 Detailed Task Breakdown
 
-### ✅ **COMPLETED (9/15)**
+### ✅ **COMPLETED (10/15)**
 
 #### Task #1: Set up project structure and dependencies
 - **Status**: ✅ COMPLETED
@@ -95,7 +95,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ---
 
-### ⏳ **PENDING (6/15)**
+### ⏳ **PENDING (5/15)**
 
 ---
 
@@ -562,29 +562,89 @@ See [PRD.md](./PRD.md) for complete specifications.
 ---
 
 #### Task #10: Build automatic rescheduling logic
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED
+- **Completed Date**: Feb 27, 2026
+- **Duration**: 1 session
 - **Priority**: HIGH (revenue impact)
-- **Dependencies**: Task #9, Task #6
-- **Estimated Duration**: 2-3 hours
-- **What needs to be done**:
-  - Implement auto-release logic (if no confirmation at 2h mark)
-  - Create waitlist/queue management
-  - Auto-fill released slots from waitlist
-  - Send slot availability notifications
-  - Update all affected parties
-  - Track appointment status changes
-  - Create audit trail for rescheduling
-- **State Machine**:
-  ```
-  SCHEDULED (24h before)
-    → Send reminder
-  WAITING_CONFIRMATION (24h - 2h before)
-    → Customer confirms → CONFIRMED
-    → Customer declines → RELEASED_SLOT
-    → No response (2h before) → AUTO_RELEASED
-      → Try to fill from waitlist
-  ```
-- **Benefits**: 80% reduction in no-shows, 15-25% revenue increase
+- **Dependencies**: Task #7 (appointments), Task #9 (reminders)
+- **What was done**:
+  - ✅ Created Waitlist entity with status tracking
+  - ✅ Implemented auto-release logic (2h before appointment)
+  - ✅ Created waitlist/queue management system
+  - ✅ Auto-fill released slots from waitlist
+  - ✅ Send slot availability notifications (email)
+  - ✅ Track waitlist position and status changes
+  - ✅ Queue position reordering on removal/decline
+  - ✅ Offer expiration (2h window)
+  - ✅ Accept/decline workflow for offered slots
+  - ✅ Audit trail via timestamps and status tracking
+  - ✅ Integration with Reminders (EmailService)
+  - ✅ Integration with Appointments (auto-release scheduling)
+  - ✅ Bull queue jobs for background processing
+  - ✅ Comprehensive error handling
+  - ✅ Swagger documentation
+- **Artifacts**:
+  - `backend/src/database/entities/waitlist.entity.ts` - Waitlist model (70 lines)
+  - `backend/src/rescheduling/rescheduling.service.ts` - Core logic (440 lines)
+  - `backend/src/rescheduling/rescheduling.controller.ts` - HTTP endpoints (120 lines)
+  - `backend/src/rescheduling/rescheduling.processor.ts` - Bull jobs (50 lines)
+  - `backend/src/rescheduling/rescheduling.module.ts` - Module config (25 lines)
+  - `backend/src/database/migrations/1704081600004-CreateWaitlistEntity.ts` - Migration (100 lines)
+  - `AUTO_RESCHEDULING_GUIDE.md` - Complete documentation
+- **API Endpoints**:
+  - `POST /rescheduling/waitlist` - Add to waitlist (JWT)
+  - `GET /rescheduling/waitlist/:barber_id/:service_id` - Check position (JWT)
+  - `DELETE /rescheduling/waitlist/:barber_id/:service_id` - Remove from waitlist (JWT)
+  - `POST /rescheduling/waitlist/accept-offer` - Accept offered slot (JWT)
+  - `POST /rescheduling/waitlist/decline-offer` - Decline offered slot (JWT)
+  - `GET /rescheduling/pending-confirmations` - Get unconfirmed appointments (JWT)
+- **Waitlist Status Workflow**:
+  - WAITING → Customer added to queue
+  - OFFERED → Slot offered, 2h expiry window
+  - CONFIRMED → Legacy status (not used in current flow)
+  - FULFILLED → Customer accepted offered slot, appointment created
+  - CANCELLED → Customer removed from waitlist
+  - NO_RESPONSE → Offer expired without response
+- **Queue Positioning**:
+  - Position 1 = first in queue
+  - Auto-increment on join
+  - Auto-reorder on removal or decline
+  - Reordering updates all positions
+- **Job Processing**:
+  - **auto-release**: Triggered 2h before appointment
+    - Checks if status still SCHEDULED
+    - Releases (sets status to CANCELLED)
+    - Offers to first waitlist customer
+    - Schedules offer expiration
+  - **expire-offer**: Triggered 2h after offer
+    - Checks if still OFFERED
+    - Updates to NO_RESPONSE
+    - Tries next customer
+- **Features**:
+  - ✅ Automatic slot filling from waitlist
+  - ✅ Position tracking and reordering
+  - ✅ Email notifications for offers
+  - ✅ 2-hour offer window with auto-expiry
+  - ✅ Accept/decline workflow
+  - ✅ Integration with appointment system
+  - ✅ Queue management (join/leave/reorder)
+  - ✅ Status tracking with timestamps
+  - ✅ Error handling and validation
+  - ✅ Comprehensive logging
+- **Database**:
+  - New: Waitlist entity with all necessary fields
+  - Modified: None (Appointments unchanged)
+  - Migration: 1704081600004-CreateWaitlistEntity.ts
+  - Indexes: tenant_id, barber_id, status, composite indexes
+- **Performance**:
+  - Expected 80%+ reduction in no-shows
+  - Expected 15-25% revenue increase
+  - Queue position queries: O(1) with indexes
+  - Offer expiration: Automated via Bull
+- **Testing**:
+  - Build successful ✅
+  - All modules registered ✅
+  - Swagger documented ✅
 - **Reference**: [PRD.md Section 4.1](./PRD.md#41-smart-reminder--auto-rescheduling-system)
 
 ---
@@ -929,13 +989,14 @@ docker-compose logs -f postgres
 | Feb 27, 2026 | 7 | Task #7 | Appointment booking system (CRUD + conflict detection) - COMPLETE ✅ |
 | Feb 27, 2026 | 8 | Task #8 | Payment processing (PIX, Card, Cash + AbakatePay) - COMPLETE ✅ |
 | Feb 27, 2026 | 9 | Task #9 | Appointment reminder system (Bull queues + email notifications) - COMPLETE ✅ |
-| - | 10 | Task #10 | Auto-rescheduling & waitlist management |
+| Feb 27, 2026 | 10 | Task #10 | Auto-rescheduling & waitlist management (no-show reduction) - COMPLETE ✅ |
+| - | 11 | Task #11 | Client dashboard (React components + appointment management) |
 | - | ... | ... | Continue with remaining tasks |
 
 ---
 
-**Last working session**: Feb 27, 2026 (Night - Reminder System)
-**Next task**: Task #10 - Auto-Rescheduling & Waitlist Management
+**Last working session**: Feb 27, 2026 (Late Night - Auto-Rescheduling)
+**Next task**: Task #11 - Create Client Dashboard
 **Estimated time for next task**: 2-3 hours
 
 ---

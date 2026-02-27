@@ -12,6 +12,7 @@ import { AvailabilityModule } from './availability/availability.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { PaymentsModule } from './payments/payments.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { ReschedulingModule } from './rescheduling/rescheduling.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { RemindersModule } from './reminders/reminders.module';
     AppointmentsModule,
     PaymentsModule,
     RemindersModule,
+    ReschedulingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
