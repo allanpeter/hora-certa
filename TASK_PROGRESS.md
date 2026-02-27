@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 26, 2026 - Evening
-**Project Status**: MVP Phase 1 - Foundation (User Auth Complete)
-**Overall Completion**: 20% (3 of 15 tasks)
+**Last Updated**: Feb 26, 2026 - Night
+**Project Status**: MVP Phase 1 - Foundation (Complete OAuth Implementation)
+**Overall Completion**: 20% (3 of 15 tasks) - Google + Apple SSO Complete
 
 ---
 
@@ -100,36 +100,60 @@ See [PRD.md](./PRD.md) for complete specifications.
 ---
 
 #### Task #3: Implement Google and Apple OAuth SSO
-- **Status**: ✅ COMPLETED (Google) / ⏳ PENDING (Apple)
+- **Status**: ✅ COMPLETED
 - **Completed Date**: Feb 26, 2026
-- **Duration**: 1 session
+- **Duration**: 2 sessions (Google + Apple)
 - **Priority**: HIGH (blocks user flow)
 - **Dependencies**: Task #2
 - **What was done**:
-  - ✅ Set up Passport.js with Google strategy
-  - ✅ Created auth service and auth controller
-  - ✅ Implemented JWT token generation (7-day expiration)
-  - ✅ Added auth guards for protected routes (JwtAuthGuard, GoogleAuthGuard)
-  - ✅ Created auth DTOs for validation
-  - ✅ Enhanced User entity with `google_id` and `email_verified` fields
-  - ✅ Created database migration for OAuth fields
-  - ✅ Set up environment configuration (.env)
-  - ✅ Comprehensive documentation and quick-start guides
-  - ⏳ Set up Passport.js with Apple strategy (TODO - future)
-- **Packages Used**: `@nestjs/passport`, `passport-google-oauth20`, `@nestjs/jwt`
+  - ✅ Session 1 - Google OAuth:
+    - Set up Passport.js with Google strategy
+    - Created auth service and auth controller
+    - Implemented JWT token generation (7-day expiration)
+    - Added auth guards for protected routes (JwtAuthGuard, GoogleAuthGuard)
+    - Created auth DTOs for validation
+    - Enhanced User entity with `google_id` and `email_verified` fields
+    - Created database migration for OAuth fields
+    - Set up environment configuration (.env)
+    - Comprehensive documentation and quick-start guides
+  - ✅ Session 2 - Apple OAuth:
+    - Set up Passport.js with Apple strategy
+    - Implemented JWT identity token validation
+    - Added Apple-specific email handling (private relay support)
+    - Created apple-auth.guard.ts for protection
+    - Enhanced User entity with `apple_id` field
+    - Created migration for apple_id column
+    - Updated auth service to support both OAuth providers
+    - Added POST endpoints for Apple OAuth flow
+    - Complete Apple setup documentation
+- **Packages Used**: `@nestjs/passport`, `passport-google-oauth20`, `passport-apple`, `@nestjs/jwt`
 - **Artifacts**:
-  - `backend/src/auth/` - Core auth module (9 files, 221 lines)
-  - `backend/src/database/migrations/1704081600001-AddOAuthFieldsToUser.ts`
-  - `backend/.env` - OAuth configuration template
-  - `AUTH_IMPLEMENTATION.md` - Technical documentation
+  - `backend/src/auth/` - Core auth module (11 files, 260+ lines)
+  - `backend/src/auth/strategies/google.strategy.ts` - Google OAuth
+  - `backend/src/auth/strategies/apple.strategy.ts` - Apple OAuth (NEW)
+  - `backend/src/auth/guards/apple-auth.guard.ts` - Apple guard (NEW)
+  - `backend/src/database/migrations/1704081600001-AddOAuthFieldsToUser.ts` - Google fields
+  - `backend/src/database/migrations/1704081600002-AddAppleOAuthToUser.ts` - Apple fields (NEW)
+  - `backend/.env` - OAuth configuration template (updated)
+  - `AUTH_IMPLEMENTATION.md` - Google OAuth documentation
   - `QUICK_START_AUTH.md` - Quick start guide
   - `IMPLEMENTATION_SUMMARY.md` - Overview
+  - `APPLE_OAUTH_SETUP.md` - Apple OAuth setup guide (NEW)
+  - `APPLE_OAUTH_SUMMARY.md` - Apple implementation summary (NEW)
 - **API Endpoints**:
-  - `GET /auth/google` - Initiate OAuth flow
-  - `GET /auth/google/callback` - OAuth callback handler
+  - `GET /auth/google` - Initiate Google OAuth flow
+  - `GET /auth/google/callback` - Google callback handler
+  - `POST /auth/apple` - Initiate Apple OAuth flow (NEW)
+  - `POST /auth/apple/callback` - Apple callback handler (NEW)
   - `GET /auth/profile` - Get current user (protected)
+- **Database**:
+  - User entity now has: google_id (unique), apple_id (unique), email_verified
+  - Supports users with Google auth, Apple auth, or both
+  - Email remains primary identifier
 - **Reference**: [PRD.md Section 2.1.8](./PRD.md#218-authentication--security-multi-tenant)
-- **Next**: Apple OAuth strategy (similar pattern)
+- **Documentation**:
+  - Google OAuth: See AUTH_IMPLEMENTATION.md + QUICK_START_AUTH.md
+  - Apple OAuth: See APPLE_OAUTH_SETUP.md + APPLE_OAUTH_SUMMARY.md
 
 ---
 
@@ -644,15 +668,16 @@ docker-compose logs -f postgres
 |------|---------|-----------|-------|
 | Feb 26, 2026 | 1 | Task #1 | Project structure + monorepo setup |
 | Feb 26, 2026 | 2 | Task #2 | Database schema: 12 entities, 8 enums, 1 migration |
-| Feb 26, 2026 | 3 | Task #3 | Google OAuth authentication (Apple SSO: TODO) |
+| Feb 26, 2026 | 3a | Task #3 | Google OAuth authentication (Session 1) |
+| Feb 26, 2026 | 3b | Task #3 | Apple OAuth authentication (Session 2) - COMPLETE ✅ |
 | - | 4 | Task #4 | User profile management |
 | - | ... | ... | Continue with remaining tasks |
 
 ---
 
-**Last working session**: Feb 26, 2026 (Evening)
-**Next task**: Task #4 - User Profile Management (or Task #3 Part 2 - Apple OAuth)
-**Estimated time for next task**: 2-3 hours (Task #4) or 1-2 hours (Apple SSO)
+**Last working session**: Feb 26, 2026 (Night - Apple OAuth)
+**Next task**: Task #4 - User Profile Management
+**Estimated time for next task**: 2-3 hours
 
 ---
 

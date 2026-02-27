@@ -26,6 +26,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true, unique: true })
   google_id: string;
 
+  @Column({ nullable: true, unique: true })
+  apple_id: string;
+
   @Column({ default: false })
   email_verified: boolean;
 }

@@ -15,24 +15,28 @@ export class AuthService {
   ) {}
 
   async validateOAuthUser(profile: {
-    google_id: string;
+    google_id?: string;
+    apple_id?: string;
     email: string;
     name: string;
     avatar_url?: string;
     email_verified: boolean;
   }): Promise<User> {
-    // Find existing user by google_id or email
+    // Find existing user by OAuth IDs or email
+    const searchConditions: any[] = [];
+    if (profile.google_id) searchConditions.push({ google_id: profile.google_id });
+    if (profile.apple_id) searchConditions.push({ apple_id: profile.apple_id });
+    searchConditions.push({ email: profile.email });
+
     let user = await this.userRepository.findOne({
-      where: [
-        { google_id: profile.google_id },
-        { email: profile.email },
-      ],
+      where: searchConditions,
     });
 
     if (!user) {
       // Create new user
       user = this.userRepository.create({
         google_id: profile.google_id,
+        apple_id: profile.apple_id,
         email: profile.email,
         name: profile.name,
         avatar_url: profile.avatar_url,
@@ -41,8 +45,9 @@ export class AuthService {
       });
       await this.userRepository.save(user);
     } else {
-      // Update existing user
-      user.google_id = profile.google_id;
+      // Update existing user with OAuth IDs and profile
+      if (profile.google_id) user.google_id = profile.google_id;
+      if (profile.apple_id) user.apple_id = profile.apple_id;
       user.name = profile.name;
       user.avatar_url = profile.avatar_url || user.avatar_url;
       user.email_verified = profile.email_verified;

@@ -1,7 +1,8 @@
-import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Req, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { AppleAuthGuard } from './guards/apple-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -27,6 +28,24 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const jwt = await this.authService.generateJwt(req.user as User);
+
+    // Redirect to frontend with token
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    res.redirect(`${frontendUrl}/auth/callback?token=${jwt.access_token}`);
+  }
+
+  @Post('apple')
+  @UseGuards(AppleAuthGuard)
+  @ApiOperation({ summary: 'Initiate Apple OAuth login' })
+  async appleAuth() {
+    // Redirects to Apple
+  }
+
+  @Post('apple/callback')
+  @UseGuards(AppleAuthGuard)
+  @ApiOperation({ summary: 'Apple OAuth callback' })
+  async appleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const jwt = await this.authService.generateJwt(req.user as User);
 
     // Redirect to frontend with token
