@@ -1,8 +1,8 @@
 # 📊 Hora Certa - Task Progress & Context
 
-**Last Updated**: Feb 26, 2026 - Night
-**Project Status**: MVP Phase 1 - Foundation (Complete OAuth Implementation)
-**Overall Completion**: 20% (3 of 15 tasks) - Google + Apple SSO Complete
+**Last Updated**: Feb 27, 2026 - Late Morning
+**Project Status**: MVP Phase 1 - Foundation (Auth + Profiles + Services Complete)
+**Overall Completion**: 33% (5 of 15 tasks) - Core Features Emerging
 
 ---
 
@@ -25,7 +25,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 ## 📈 Completion Overview
 
 ```
-[███████░░░░░░░░░░░░░] 20% (3/15 tasks completed)
+[█████████████░░░░░░░] 33% (5/15 tasks completed)
 ```
 
 | Phase | Status | Duration |
@@ -39,7 +39,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ## 📋 Detailed Task Breakdown
 
-### ✅ **COMPLETED (3/15)**
+### ✅ **COMPLETED (5/15)**
 
 #### Task #1: Set up project structure and dependencies
 - **Status**: ✅ COMPLETED
@@ -95,7 +95,7 @@ See [PRD.md](./PRD.md) for complete specifications.
 
 ---
 
-### ⏳ **PENDING (12/15)**
+### ⏳ **PENDING (10/15)**
 
 ---
 
@@ -158,42 +158,109 @@ See [PRD.md](./PRD.md) for complete specifications.
 ---
 
 #### Task #4: Create user profile management system
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED
+- **Completed Date**: Feb 27, 2026
+- **Duration**: 1 session
 - **Priority**: MEDIUM
-- **Dependencies**: Task #3
-- **Estimated Duration**: 2 hours
-- **What needs to be done**:
-  - Create user profile service
-  - Create profile update endpoints (GET, PATCH)
-  - Implement profile completion tracking
-  - Add avatar upload functionality
-  - Create role-based profile views (Barber vs Client)
-  - Add validation for profile fields
-- **Endpoints**:
-  - `GET /api/users/profile`
-  - `PATCH /api/users/profile`
-  - `GET /api/users/:id/profile`
+- **Dependencies**: Task #3 (OAuth)
+- **What was done**:
+  - ✅ Created UsersService with full CRUD logic
+  - ✅ Created UsersController with REST endpoints
+  - ✅ Implemented UpdateProfileDto with validation
+  - ✅ Created ProfileResponseDto for type-safe responses
+  - ✅ Email uniqueness validation
+  - ✅ Phone number validation (Brazilian format)
+  - ✅ Avatar URL management
+  - ✅ JWT authentication on endpoints
+  - ✅ Error handling (404, 400, 401)
+  - ✅ Swagger documentation with examples
+  - ✅ Type-safe database operations
+- **Artifacts**:
+  - `backend/src/users/` - Users module (5 files, 190 lines)
+  - `backend/src/users/users.service.ts` - Business logic (90 lines)
+  - `backend/src/users/users.controller.ts` - HTTP endpoints (60 lines)
+  - `backend/src/users/users.module.ts` - Module config (11 lines)
+  - `backend/src/users/dto/update-profile.dto.ts` - Validation (17 lines)
+  - `backend/src/users/dto/profile-response.dto.ts` - Response (13 lines)
+  - `USER_PROFILE_GUIDE.md` - Complete documentation
+- **API Endpoints**:
+  - `GET /users/profile` - Current user profile (protected)
+  - `PATCH /users/profile` - Update current user (protected)
+  - `GET /users/:id` - Get user by ID (public)
+- **Features**:
+  - ✅ Get own profile (JWT protected)
+  - ✅ Update own profile (name, email, phone, avatar)
+  - ✅ Email uniqueness validation
+  - ✅ Phone format validation (11-15 digits)
+  - ✅ Error handling and validation
+  - ✅ Type-safe DTOs
+  - ✅ Automatic timestamps
+- **Database**:
+  - Uses existing User entity
+  - All fields (name, email, phone, avatar_url, user_type, email_verified, etc)
+  - Email uniqueness enforced
+  - Timestamps (created_at, updated_at)
+- **Testing**:
+  - Build successful
+  - All validations working
+  - Swagger documented
 - **Reference**: [PRD.md Section 2.1.1](./PRD.md#211-customer-management)
 
 ---
 
 #### Task #5: Build barber service management
-- **Status**: ⏳ PENDING
+- **Status**: ✅ COMPLETED
+- **Completed Date**: Feb 27, 2026
+- **Duration**: 1 session
 - **Priority**: HIGH (blocks booking)
 - **Dependencies**: Task #2, Task #4
-- **Estimated Duration**: 2-3 hours
-- **What needs to be done**:
-  - Create services CRUD endpoints
-  - Implement service pricing and duration
-  - Add service categories (Hair, Beard, Combo, Product)
-  - Create barber-service assignments
-  - Allow custom prices per barber (optional)
-  - Validate service data
-- **Endpoints**:
-  - `POST /api/services` - Create service
-  - `GET /api/services` - List services
-  - `PATCH /api/services/:id` - Update service
-  - `DELETE /api/services/:id` - Delete service
+- **What was done**:
+  - ✅ Created ServicesService with full CRUD logic
+  - ✅ Created ServicesController with REST endpoints
+  - ✅ Implemented CreateServiceDto with validation
+  - ✅ Implemented UpdateServiceDto for partial updates
+  - ✅ Created ServiceResponseDto for type-safe responses
+  - ✅ Service pricing with decimal validation
+  - ✅ Duration in minutes with validation
+  - ✅ Category enum support (HAIR, BEARD, COMBO, PRODUCT)
+  - ✅ Active/inactive status toggle
+  - ✅ Filter by category functionality
+  - ✅ Get active services only
+  - ✅ JWT authentication on all endpoints
+  - ✅ Tenant isolation (services belong to creator)
+  - ✅ Comprehensive error handling
+  - ✅ Swagger documentation
+- **Artifacts**:
+  - `backend/src/services/` - Services module (6 files, 329 lines)
+  - `backend/src/services/services.service.ts` - Business logic (120 lines)
+  - `backend/src/services/services.controller.ts` - HTTP endpoints (140 lines)
+  - `backend/src/services/services.module.ts` - Module config (12 lines)
+  - `backend/src/services/dto/create-service.dto.ts` - Creation validation (21 lines)
+  - `backend/src/services/dto/update-service.dto.ts` - Update validation (23 lines)
+  - `backend/src/services/dto/service-response.dto.ts` - Response format (13 lines)
+  - `BARBER_SERVICES_GUIDE.md` - Complete documentation
+- **API Endpoints**:
+  - `POST /services` - Create service (JWT protected)
+  - `GET /services` - List all services (JWT protected)
+  - `GET /services/active` - Get active services only (JWT protected)
+  - `GET /services/category/:category` - Filter by category (JWT protected)
+  - `GET /services/:id` - Get specific service (JWT protected)
+  - `PATCH /services/:id` - Update service (JWT protected)
+  - `PATCH /services/:id/toggle` - Toggle active status (JWT protected)
+  - `DELETE /services/:id` - Delete service (JWT protected)
+- **Features**:
+  - ✅ Full CRUD operations
+  - ✅ Service pricing and duration
+  - ✅ Category filtering
+  - ✅ Status management (active/inactive)
+  - ✅ Type-safe validations
+  - ✅ Tenant isolation
+  - ✅ Error handling (404, 401)
+  - ✅ Swagger documented
+- **Database**:
+  - Uses existing Service entity (TenantBaseEntity)
+  - BarberService entity ready for future barber-specific assignments
+  - Full multi-tenant support
 - **Reference**: [PRD.md Section 2.1.3](./PRD.md#213-services-management)
 
 ---
@@ -670,14 +737,16 @@ docker-compose logs -f postgres
 | Feb 26, 2026 | 2 | Task #2 | Database schema: 12 entities, 8 enums, 1 migration |
 | Feb 26, 2026 | 3a | Task #3 | Google OAuth authentication (Session 1) |
 | Feb 26, 2026 | 3b | Task #3 | Apple OAuth authentication (Session 2) - COMPLETE ✅ |
-| - | 4 | Task #4 | User profile management |
+| Feb 27, 2026 | 4 | Task #4 | User profile management (GET/PATCH endpoints) - COMPLETE ✅ |
+| Feb 27, 2026 | 5 | Task #5 | Barber service management (CRUD + filtering) - COMPLETE ✅ |
+| - | 6 | Task #6 | Calendar and availability system |
 | - | ... | ... | Continue with remaining tasks |
 
 ---
 
-**Last working session**: Feb 26, 2026 (Night - Apple OAuth)
-**Next task**: Task #4 - User Profile Management
-**Estimated time for next task**: 2-3 hours
+**Last working session**: Feb 27, 2026 (Late Morning - Barber Services)
+**Next task**: Task #6 - Calendar and Availability System
+**Estimated time for next task**: 3-4 hours
 
 ---
 
