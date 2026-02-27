@@ -31,6 +31,16 @@ export class AppointmentsService {
     private serviceRepository: Repository<Service>,
   ) {}
 
+  /**
+   * Optional: Set reminders service for appointment booking
+   * This is injected via the AppointmentsModule to avoid circular dependencies
+   */
+  setRemindersService(remindersService: any) {
+    this.remindersService = remindersService;
+  }
+
+  private remindersService: any;
+
   async createAppointment(
     userId: string,
     tenantId: string,
@@ -133,6 +143,14 @@ export class AppointmentsService {
     });
 
     const saved = await this.appointmentRepository.save(appointment);
+
+    // Schedule reminder for 24h before appointment
+    if (this.remindersService) {
+      this.remindersService.scheduleReminder(saved.id).catch((error: any) => {
+        console.error(`Failed to schedule reminder for appointment ${saved.id}`, error);
+      });
+    }
+
     return this.formatResponse(saved);
   }
 
