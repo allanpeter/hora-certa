@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { dataSourceOptions } from './database/data-source';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { TenantsModule } from './tenants/tenants.module';
 import { ServicesModule } from './services/services.module';
 import { AvailabilityModule } from './availability/availability.module';
 import { AppointmentsModule } from './appointments/appointments.module';
@@ -36,6 +37,7 @@ import { ReschedulingModule } from './rescheduling/rescheduling.module';
     }),
     AuthModule,
     UsersModule,
+    TenantsModule,
     ServicesModule,
     AvailabilityModule,
     AppointmentsModule,

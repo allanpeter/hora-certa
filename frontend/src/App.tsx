@@ -149,7 +149,22 @@ function LoginPage() {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3001/auth/google';
+    // In development, use localhost backend directly
+    // In production, use the configured API URL
+    const apiUrl = import.meta.env.VITE_API_URL;
+    let authUrl: string;
+
+    if (apiUrl) {
+      // Production: use the configured API URL
+      authUrl = apiUrl.endsWith('/api')
+        ? `${apiUrl}/auth/google`
+        : `${apiUrl}/api/auth/google`;
+    } else {
+      // Development: use localhost backend with /api prefix
+      authUrl = 'http://localhost:3001/api/auth/google';
+    }
+
+    window.location.href = authUrl;
   };
 
   return (
