@@ -9,6 +9,9 @@ import { BookingPage } from './pages/BookingPage';
 import { AppointmentsPage } from './pages/AppointmentsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LoyaltyPage } from './pages/LoyaltyPage';
+import { CreateShopPage } from './pages/CreateShopPage';
+import { MyShopsPage } from './pages/MyShopsPage';
+import { ShopManagementPage } from './pages/ShopManagementPage';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -88,6 +91,34 @@ function App() {
                 <Layout>
                   <LoyaltyPage />
                 </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Shop Management Routes */}
+          <Route
+            path="/create-shop"
+            element={
+              <ProtectedRoute>
+                <CreateShopPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shops"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <MyShopsPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shop/:shopId"
+            element={
+              <ProtectedRoute>
+                <ShopManagementPage />
               </ProtectedRoute>
             }
           />

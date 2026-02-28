@@ -1,8 +1,12 @@
+import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
 import { useAuthStore } from '../stores/auth.store';
 import { UpcomingAppointments } from '../components/UpcomingAppointments';
 import { PaymentHistory } from '../components/PaymentHistory';
 import { LoyaltyPoints } from '../components/LoyaltyPoints';
+import { Button } from '../components/FormElements';
+
+type UserType = 'CLIENT' | 'OWNER' | 'BARBER' | 'RECEPTIONIST' | 'ADMIN';
 
 export const Dashboard = () => {
   const { data: profile, isLoading } = useProfile();
@@ -21,7 +25,9 @@ export const Dashboard = () => {
     );
   }
 
+  const navigate = useNavigate();
   const userName = profile?.name || user?.name || 'Usuário';
+  const userType = (profile?.user_type || user?.user_type) as UserType;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -30,7 +36,11 @@ export const Dashboard = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Hora Certa</h1>
-            <p className="text-sm text-gray-500">Seu gerenciador de agendamentos</p>
+            <p className="text-sm text-gray-500">
+              {userType === 'OWNER' || userType === 'BARBER' || userType === 'RECEPTIONIST'
+                ? 'Seu gerenciador de barbearia'
+                : 'Seu gerenciador de agendamentos'}
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
@@ -49,6 +59,51 @@ export const Dashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Shop Management Banner - Show for shop owners/staff */}
+        {(userType === 'OWNER' || userType === 'BARBER' || userType === 'RECEPTIONIST' || userType === 'MANAGER') && (
+          <div className="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Gerenciar Barbearia</h2>
+                <p className="text-blue-100">
+                  {userType === 'OWNER'
+                    ? 'Acesse suas barbearias, gerencie funcionários e configure seus serviços'
+                    : 'Acesse as barbearias onde você trabalha'}
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/shops')}
+                variant="primary"
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-gray-50"
+              >
+                {userType === 'OWNER' ? '→ Minhas Barbearias' : '→ Visualizar Barbearias'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Create First Shop Banner - Show for clients without shops */}
+        {userType === 'CLIENT' && (
+          <div className="mb-8 bg-gradient-to-r from-green-600 to-green-700 rounded-lg shadow-lg p-6 text-white">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Quer Gerenciar uma Barbearia?</h2>
+                <p className="text-green-100">
+                  Crie sua primeira barbearia e comece a receber agendamentos hoje mesmo
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/create-shop')}
+                variant="primary"
+                size="lg"
+                className="bg-white text-green-600 hover:bg-gray-50"
+              >
+                + Criar Barbearia
+              </Button>
+            </div>
+          </div>
+        )}
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
