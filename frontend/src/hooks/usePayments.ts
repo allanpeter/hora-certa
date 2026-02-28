@@ -62,19 +62,19 @@ export const usePaymentStats = () => {
       };
 
       if (data.data && Array.isArray(data.data)) {
-        stats.totalSpent = data.data.reduce((sum, payment) => sum + payment.amount, 0);
+        stats.totalSpent = data.data.reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
 
         // Get most recent paid payment
         const paidPayments = data.data
-          .filter((p) => p.status === 'PAID')
-          .sort((a, b) => new Date(b.paid_at || '').getTime() - new Date(a.paid_at || '').getTime());
+          .filter((p: Payment) => p.status === 'PAID')
+          .sort((a: Payment, b: Payment) => new Date(b.paid_at || '').getTime() - new Date(a.paid_at || '').getTime());
 
         if (paidPayments.length > 0) {
           stats.lastPaymentDate = paidPayments[0].paid_at || null;
         }
 
         // Count by method
-        data.data.forEach((payment) => {
+        data.data.forEach((payment: Payment) => {
           stats.paymentMethods[payment.method] = (stats.paymentMethods[payment.method] || 0) + 1;
           stats.paymentStatuses[payment.status] = (stats.paymentStatuses[payment.status] || 0) + 1;
         });

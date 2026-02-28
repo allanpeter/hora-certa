@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useBarberAppointmentsWeek } from '../hooks/useBarberAppointments';
-import { formatTime, formatDate } from '../utils/dateUtils';
+import { formatTime } from '../utils/dateUtils';
 
 export const WeekCalendar = () => {
   const { data, isLoading } = useBarberAppointmentsWeek();
@@ -100,9 +100,9 @@ export const WeekCalendar = () => {
                         className={`p-2 rounded border border-gray-300 text-xs ${getStatusColor(apt.status)}`}
                       >
                         <p className="font-semibold text-gray-800 truncate">
-                          {apt.customer?.name || 'Cliente'}
+                          Cliente
                         </p>
-                        <p className="text-gray-700 truncate">{apt.service?.name}</p>
+                        <p className="text-gray-700 truncate">Serviço</p>
                         <p className="text-gray-600 font-medium">
                           {formatTime(new Date(apt.scheduled_start))}
                         </p>

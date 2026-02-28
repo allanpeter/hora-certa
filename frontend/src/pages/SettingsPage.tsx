@@ -38,7 +38,7 @@ export const SettingsPage = () => {
     return (
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Configurações</h1>
-        <Card className="h-96 bg-gray-200 animate-pulse" />
+        <div className="h-96 bg-gray-200 animate-pulse rounded-lg" />
       </div>
     );
   }

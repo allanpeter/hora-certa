@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useBarberAppointmentsToday, useUpdateAppointmentStatus } from '../hooks/useBarberAppointments';
-import { formatTime, formatDate } from '../utils/dateUtils';
+import { formatTime } from '../utils/dateUtils';
 
 export const TodayAppointments = () => {
   const { data, isLoading, error } = useBarberAppointmentsToday();
@@ -55,9 +55,9 @@ export const TodayAppointments = () => {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="font-bold text-lg text-gray-900">
-                    {appointment.customer?.name || 'Cliente'}
+                    Cliente
                   </p>
-                  <p className="text-sm text-gray-600">{appointment.service?.name}</p>
+                  <p className="text-sm text-gray-600">Serviço</p>
                 </div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${

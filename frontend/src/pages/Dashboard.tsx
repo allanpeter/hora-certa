@@ -27,7 +27,7 @@ export const Dashboard = () => {
 
   const navigate = useNavigate();
   const userName = profile?.name || user?.name || 'Usuário';
-  const userType = (profile?.user_type || user?.user_type) as UserType;
+  const userType = (profile?.user_type || 'CLIENT') as UserType;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -60,7 +60,7 @@ export const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Shop Management Banner - Show for shop owners/staff */}
-        {(userType === 'OWNER' || userType === 'BARBER' || userType === 'RECEPTIONIST' || userType === 'MANAGER') && (
+        {(userType === 'OWNER' || userType === 'BARBER' || userType === 'RECEPTIONIST') && (
           <div className="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
             <div className="flex justify-between items-center">
               <div>

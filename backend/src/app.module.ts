@@ -14,6 +14,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { PaymentsModule } from './payments/payments.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { ReschedulingModule } from './rescheduling/rescheduling.module';
+import { BarbersModule } from './barbers/barbers.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ReschedulingModule } from './rescheduling/rescheduling.module';
     UsersModule,
     TenantsModule,
     ServicesModule,
+    BarbersModule,
     AvailabilityModule,
     AppointmentsModule,
     PaymentsModule,

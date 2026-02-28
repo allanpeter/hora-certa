@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Card, Select, Button, Alert, Badge } from '../components/FormElements';
-import { formatTime } from '../utils/dateUtils';
+import { Card, Button, Alert } from '../components/FormElements';
 
 interface TimeSlot {
   id: string;

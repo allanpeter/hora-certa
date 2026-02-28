@@ -68,7 +68,7 @@ export const AppointmentsPage = () => {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="h-24 bg-gray-200 animate-pulse" />
+            <div key={i} className="h-24 bg-gray-200 animate-pulse rounded-lg" />
           ))}
         </div>
       ) : appointments.length === 0 ? (
