@@ -9,6 +9,7 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../database/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,6 +23,12 @@ export class AuthController {
   @ApiOperation({ summary: 'Create user with email and password' })
   async signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Login with email and password' })
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @Get('google')

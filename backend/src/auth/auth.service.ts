@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { User } from '../database/entities/user.entity';
 import { UserType } from '../common/enums';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -70,15 +71,40 @@ export class AuthService {
 
     const password_hash = await bcrypt.hash(signupDto.password, 10);
 
+    // Clean phone number: remove formatting characters
+    const cleanPhone = signupDto.phone ? signupDto.phone.replace(/\D/g, '') : null;
+
     const user = this.userRepository.create({
       email: signupDto.email,
       password_hash,
       name: signupDto.name,
+      phone: cleanPhone,
       user_type: UserType.CLIENT,
       email_verified: false,
     });
 
     await this.userRepository.save(user);
+    return this.generateJwt(user);
+  }
+
+  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+    const user = await this.userRepository.findOne({
+      where: { email: loginDto.email },
+    });
+
+    if (!user || !user.password_hash) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await this.validatePassword(
+      loginDto.password,
+      user.password_hash,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
     return this.generateJwt(user);
   }
 

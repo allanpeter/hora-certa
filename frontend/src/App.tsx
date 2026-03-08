@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from './stores/auth.store';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -12,6 +12,8 @@ import { LoyaltyPage } from './pages/LoyaltyPage';
 import { CreateShopPage } from './pages/CreateShopPage';
 import { MyShopsPage } from './pages/MyShopsPage';
 import { ShopManagementPage } from './pages/ShopManagementPage';
+import api from './config/api';
+import { SignupModal } from './components/SignupModal';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
@@ -173,6 +175,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function LoginPage() {
   const token = useAuthStore((state) => state.token);
+  const setToken = useAuthStore((state) => state.setToken);
+  const setUser = useAuthStore((state) => state.setUser);
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // If user is already logged in, redirect to dashboard
   if (token) {
@@ -180,66 +191,182 @@ function LoginPage() {
   }
 
   const handleGoogleLogin = () => {
-    // In development, use localhost backend directly
-    // In production, use the configured API URL
     const apiUrl = import.meta.env.VITE_API_URL;
     let authUrl: string;
 
     if (apiUrl) {
-      // Production: use the configured API URL
       authUrl = apiUrl.endsWith('/api')
         ? `${apiUrl}/auth/google`
         : `${apiUrl}/api/auth/google`;
     } else {
-      // Development: use localhost backend with /api prefix
       authUrl = 'http://localhost:3001/api/auth/google';
     }
 
     window.location.href = authUrl;
   };
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password: senha,
+      });
+
+      const { access_token, user } = response.data;
+      setToken(access_token);
+      setUser({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.user_type,
+      });
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Email ou senha inválidos.';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-      <div className="container py-20">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Hora Certa</h1>
-          <p className="text-xl text-gray-300 mb-8">
-            Intelligent barber shop management system
-          </p>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Logo & Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4">
+              <span className="text-2xl">✂️</span>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2">Hora Certa</h1>
+            <p className="text-gray-400">Gerenciamento inteligente para barbearias</p>
+          </div>
 
-          <div className="bg-slate-800 rounded-lg p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-4">Faça login para continuar</h2>
-            <p className="text-gray-400 mb-6">
-              Use sua conta Google para acessar a plataforma
-            </p>
+          {/* Login Card */}
+          <div className="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
+            {/* Error Message - Top of card */}
+            {error && (
+              <div className="bg-red-950 border-2 border-red-700 rounded-lg p-4 mb-6 flex items-start justify-between gap-3 animate-pulse">
+                <div className="flex-1">
+                  <p className="text-red-300 text-sm font-semibold">⚠️ Erro ao fazer login</p>
+                  <p className="text-red-200 text-sm mt-1">{error}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setError('')}
+                  className="text-red-400 hover:text-red-300 flex-shrink-0 text-xl leading-none"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
-            <button onClick={handleGoogleLogin} className="w-full bg-white text-gray-900 py-3 rounded-lg font-semibold hover:bg-gray-100 transition mb-4">
+            {/* Email/Password Form */}
+            <form onSubmit={handleLogin} className="space-y-4 mb-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu_email@exemplo.com"
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="senha" className="block text-sm font-medium text-gray-300">
+                    Senha
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-xs text-amber-400 hover:text-amber-300 transition"
+                  >
+                    {showPassword ? '🙈 Ocultar' : '👁️ Mostrar'}
+                  </button>
+                </div>
+                <input
+                  id="senha"
+                  type={showPassword ? 'text' : 'password'}
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading || !email || !senha}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold rounded-lg hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {isLoading ? 'Entrando...' : 'Entrar'}
+              </button>
+            </form>
+
+            {/* Forgot Password & Sign Up Links */}
+            <div className="flex items-center justify-between text-sm mb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  // TODO: Implement forgot password flow
+                  alert('Recuperação de senha em breve');
+                }}
+                className="text-amber-400 hover:text-amber-300 transition"
+              >
+                Esqueceu a senha?
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSignupModal(true)}
+                className="text-amber-400 hover:text-amber-300 transition"
+              >
+                Crie seu cadastro
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex-1 h-px bg-slate-700"></div>
+              <span className="text-gray-500 text-sm">ou</span>
+              <div className="flex-1 h-px bg-slate-700"></div>
+            </div>
+
+            {/* Google Login */}
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full py-3 bg-white text-slate-900 font-semibold rounded-lg hover:bg-gray-100 transition flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.91 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+              </svg>
               Continuar com Google
             </button>
-
-            <p className="text-gray-500 text-sm">
-              Backend está rodando. Acesse a documentação em{' '}
-              <code className="bg-slate-900 px-2 py-1 rounded">http://localhost:3001/api</code>
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">📅 Agendamentos</h3>
-              <p className="text-gray-400 text-sm">Gerenciamento inteligente de agendamentos</p>
-            </div>
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">💳 Pagamentos</h3>
-              <p className="text-gray-400 text-sm">PIX e integração com cartão</p>
-            </div>
-            <div className="bg-slate-700 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">⭐ Fidelidade</h3>
-              <p className="text-gray-400 text-sm">Programa de pontos e recompensas</p>
-            </div>
-          </div>
+          {/* Footer */}
+          <p className="text-center text-gray-500 text-xs mt-6">
+            Plataforma segura para gerenciar sua barbearia
+          </p>
         </div>
       </div>
-    </div>
+
+      {/* Signup Modal */}
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+      />
+    </>
   );
 }
 

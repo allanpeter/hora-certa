@@ -11,21 +11,8 @@ type UserType = 'CLIENT' | 'OWNER' | 'BARBER' | 'RECEPTIONIST' | 'ADMIN';
 export const Dashboard = () => {
   const { data: profile, isLoading } = useProfile();
   const { user, logout } = useAuthStore();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto">
-            <div className="h-12 bg-gray-300 rounded animate-pulse mb-8"></div>
-            <div className="h-96 bg-gray-300 rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const navigate = useNavigate();
+
   const userName = profile?.name || user?.name || 'Usuário';
   const userType = (profile?.user_type || 'CLIENT') as UserType;
 
@@ -44,8 +31,10 @@ export const Dashboard = () => {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="font-semibold text-gray-900">Bem-vindo, {userName}!</p>
-              <p className="text-sm text-gray-500">{profile?.email}</p>
+              <p className="font-semibold text-gray-900">
+                Bem-vindo, {isLoading ? <span className="text-gray-400">Carregando...</span> : userName}!
+              </p>
+              <p className="text-sm text-gray-500">{profile?.email || (isLoading ? 'Carregando email...' : user?.email)}</p>
             </div>
             <button
               onClick={logout}
