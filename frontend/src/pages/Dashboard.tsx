@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useProfile } from '../hooks/useProfile';
+import { useState } from 'react';
+import { useProfile, useUpdateProfile } from '../hooks/useProfile';
 import { useAuthStore } from '../stores/auth.store';
 import { UpcomingAppointments } from '../components/UpcomingAppointments';
 import { PaymentHistory } from '../components/PaymentHistory';
 import { LoyaltyPoints } from '../components/LoyaltyPoints';
-import { Button } from '../components/FormElements';
 
 type UserType = 'CLIENT' | 'OWNER' | 'BARBER' | 'RECEPTIONIST' | 'ADMIN';
 
@@ -12,9 +12,26 @@ export const Dashboard = () => {
   const { data: profile, isLoading } = useProfile();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const updateProfile = useUpdateProfile();
+
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
   const userName = profile?.name || user?.name || 'Usuário';
   const userType = (profile?.user_type || 'CLIENT') as UserType;
+
+  const handleBecomeOwner = async () => {
+    setIsUpdatingRole(true);
+    try {
+      await updateProfile.mutateAsync({ user_type: 'OWNER' });
+      setShowRoleModal(false);
+      navigate('/create-shop');
+    } catch (error) {
+      console.error('Failed to update role:', error);
+    } finally {
+      setIsUpdatingRole(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -48,51 +65,6 @@ export const Dashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Shop Management Banner - Show for shop owners/staff */}
-        {(userType === 'OWNER' || userType === 'BARBER' || userType === 'RECEPTIONIST') && (
-          <div className="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Gerenciar Barbearia</h2>
-                <p className="text-blue-100">
-                  {userType === 'OWNER'
-                    ? 'Acesse suas barbearias, gerencie funcionários e configure seus serviços'
-                    : 'Acesse as barbearias onde você trabalha'}
-                </p>
-              </div>
-              <Button
-                onClick={() => navigate('/shops')}
-                variant="primary"
-                size="lg"
-                className="bg-white text-blue-600 hover:bg-gray-50"
-              >
-                {userType === 'OWNER' ? '→ Minhas Barbearias' : '→ Visualizar Barbearias'}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Create First Shop Banner - Show for clients without shops */}
-        {userType === 'CLIENT' && (
-          <div className="mb-8 bg-gradient-to-r from-green-600 to-green-700 rounded-lg shadow-lg p-6 text-white">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Quer Gerenciar uma Barbearia?</h2>
-                <p className="text-green-100">
-                  Crie sua primeira barbearia e comece a receber agendamentos hoje mesmo
-                </p>
-              </div>
-              <Button
-                onClick={() => navigate('/create-shop')}
-                variant="primary"
-                size="lg"
-                className="bg-white text-green-600 hover:bg-gray-50"
-              >
-                + Criar Barbearia
-              </Button>
-            </div>
-          </div>
-        )}
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -202,6 +174,54 @@ export const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Role Confirmation Modal */}
+      {showRoleModal && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowRoleModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md">
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-4">💈</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Se tornar Dono de Barbearia
+                </h2>
+                <p className="text-gray-600">
+                  Você está prestes a se tornar um proprietário. Isso mudará seu perfil e você terá acesso a ferramentas de gerenciamento.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800">
+                  ℹ️ Você poderá gerenciar sua barbearia, adicionar funcionários e receber agendamentos.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowRoleModal(false)}
+                  className="flex-1 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 font-semibold transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleBecomeOwner}
+                  disabled={isUpdatingRole}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition"
+                >
+                  {isUpdatingRole ? 'Processando...' : 'Confirmar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
+import { useProfile } from '../hooks/useProfile';
 
 interface NavItem {
   path: string;
   label: string;
   icon: string;
   requiresAuth: boolean;
+  requiresOwner?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -14,6 +16,7 @@ const navItems: NavItem[] = [
   { path: '/appointments', label: 'Meus Agendamentos', icon: '📅', requiresAuth: true },
   { path: '/book', label: 'Agendar', icon: '✨', requiresAuth: false },
   { path: '/loyalty', label: 'Fidelidade', icon: '⭐', requiresAuth: true },
+  { path: '/shops', label: 'Gerenciar Barbearia', icon: '💈', requiresAuth: true, requiresOwner: true },
   { path: '/settings', label: 'Configurações', icon: '⚙️', requiresAuth: true },
 ];
 
@@ -22,6 +25,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { token, logout } = useAuthStore();
+  const { data: profile } = useProfile();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -54,7 +58,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <nav className="bg-gray-50 border-t border-gray-200">
             <div className="space-y-1 px-4 py-2">
               {navItems
-                .filter((item) => !item.requiresAuth || token)
+                .filter((item) => (!item.requiresAuth || token) && (!item.requiresOwner || profile?.user_type === 'OWNER'))
                 .map((item) => (
                   <button
                     key={item.path}
@@ -93,7 +97,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           <nav className="flex-1 px-4 space-y-2">
             {navItems
-              .filter((item) => !item.requiresAuth || token)
+              .filter((item) => (!item.requiresAuth || token) && (!item.requiresOwner || profile?.user_type === 'OWNER'))
               .map((item) => (
                 <button
                   key={item.path}

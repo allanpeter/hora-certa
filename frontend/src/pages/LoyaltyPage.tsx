@@ -18,96 +18,11 @@ interface PointTransaction {
   type: 'earn' | 'redeem';
 }
 
-const mockRewards: Reward[] = [
-  {
-    id: '1',
-    name: 'Corte 10% Desconto',
-    description: 'Ganhe 10% de desconto no próximo corte',
-    points: 100,
-    image: '💈',
-    available: true,
-    claimed: false,
-  },
-  {
-    id: '2',
-    name: 'Corte Grátis',
-    description: 'Um corte masculino completamente grátis',
-    points: 500,
-    image: '🎁',
-    available: true,
-    claimed: false,
-  },
-  {
-    id: '3',
-    name: 'Pacote VIP Mensal',
-    description: '2 cortes + 2 barbas + 1 tratamento',
-    points: 1000,
-    image: '👑',
-    available: false,
-    claimed: false,
-  },
-  {
-    id: '4',
-    name: 'Acessório Premium',
-    description: 'Escolha um acessório grátis',
-    points: 200,
-    image: '🎀',
-    available: true,
-    claimed: false,
-  },
-  {
-    id: '5',
-    name: 'Sessão de Consultoria',
-    description: 'Consultoria de estilo de cabelo',
-    points: 150,
-    image: '👨‍🏫',
-    available: true,
-    claimed: false,
-  },
-  {
-    id: '6',
-    name: 'Referral Bonus',
-    description: '200 pontos se seu amigo se registrar',
-    points: 0,
-    image: '👥',
-    available: true,
-    claimed: false,
-  },
-];
-
-const mockTransactions: PointTransaction[] = [
-  {
-    id: '1',
-    date: '2026-02-25',
-    description: 'Agendamento concluído - Corte + Barba',
-    points: 130,
-    type: 'earn',
-  },
-  {
-    id: '2',
-    date: '2026-02-20',
-    description: 'Agendamento concluído - Corte',
-    points: 50,
-    type: 'earn',
-  },
-  {
-    id: '3',
-    date: '2026-02-18',
-    description: 'Resgata: Corte 10% Desconto',
-    points: -100,
-    type: 'redeem',
-  },
-  {
-    id: '4',
-    date: '2026-02-15',
-    description: 'Bônus de boas-vindas',
-    points: 50,
-    type: 'earn',
-  },
-];
-
 export const LoyaltyPage = () => {
-  const totalPoints = 330;
+  // TODO: Integrate with real API endpoints for rewards and transactions
+  const rewards: Reward[] = [];
+  const transactions: PointTransaction[] = [];
+  const totalPoints = 0;
   const nextTier = 500; // Silver tier
   const pointsNeeded = nextTier - totalPoints;
 
@@ -173,56 +88,68 @@ export const LoyaltyPage = () => {
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-bold mb-6">Recompensas Disponíveis</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mockRewards.map((reward) => (
-              <Card
-                key={reward.id}
-                className={`cursor-pointer transition ${
-                  reward.available ? 'hover:shadow-lg' : 'opacity-60'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="text-4xl">{reward.image}</div>
-                  <Badge
-                    variant={
-                      reward.available
-                        ? reward.claimed
-                          ? 'success'
-                          : 'default'
-                        : 'warning'
-                    }
-                  >
-                    {!reward.available
-                      ? '🔒 Em breve'
-                      : reward.claimed
-                        ? '✓ Obtido'
-                        : `${reward.points} pts`}
-                  </Badge>
-                </div>
-
-                <h3 className="font-bold text-lg mb-1">{reward.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
-
-                {reward.available && !reward.claimed && (
-                  <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm">
-                    Resgatar Agora
-                  </button>
-                )}
-
-                {reward.claimed && (
-                  <div className="w-full py-2 px-4 bg-green-100 text-green-800 rounded-lg text-center font-medium text-sm">
-                    ✓ Desbloqueado
+          {rewards.length === 0 ? (
+            <Card className="text-center py-12">
+              <p className="text-2xl mb-2">🎁</p>
+              <p className="text-lg font-semibold text-gray-900 mb-2">
+                Recompensas em breve
+              </p>
+              <p className="text-gray-600">
+                Estamos preparando as recompensas para você
+              </p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {rewards.map((reward) => (
+                <Card
+                  key={reward.id}
+                  className={`cursor-pointer transition ${
+                    reward.available ? 'hover:shadow-lg' : 'opacity-60'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="text-4xl">{reward.image}</div>
+                    <Badge
+                      variant={
+                        reward.available
+                          ? reward.claimed
+                            ? 'success'
+                            : 'default'
+                          : 'warning'
+                      }
+                    >
+                      {!reward.available
+                        ? '🔒 Em breve'
+                        : reward.claimed
+                          ? '✓ Obtido'
+                          : `${reward.points} pts`}
+                    </Badge>
                   </div>
-                )}
 
-                {!reward.available && (
-                  <div className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium text-sm">
-                    Em breve
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
+                  <h3 className="font-bold text-lg mb-1">{reward.name}</h3>
+                  <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
+
+                  {reward.available && !reward.claimed && (
+                    <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm">
+                      Resgatar Agora
+                    </button>
+                  )}
+
+                  {reward.claimed && (
+                    <div className="w-full py-2 px-4 bg-green-100 text-green-800 rounded-lg text-center font-medium text-sm">
+                      ✓ Desbloqueado
+                    </div>
+                  )}
+
+                  {!reward.available && (
+                    <div className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium text-sm">
+                      Em breve
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* History Sidebar */}
@@ -230,30 +157,36 @@ export const LoyaltyPage = () => {
           <h2 className="text-2xl font-bold mb-6">Histórico de Pontos</h2>
 
           <Card className="p-0">
-            <div className="divide-y">
-              {mockTransactions.map((transaction) => (
-                <div key={transaction.id} className="p-4 hover:bg-gray-50 transition">
-                  <div className="flex items-start justify-between mb-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      {transaction.description}
+            {transactions.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <p className="text-sm">Nenhuma transação ainda</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {transactions.map((transaction) => (
+                  <div key={transaction.id} className="p-4 hover:bg-gray-50 transition">
+                    <div className="flex items-start justify-between mb-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {transaction.description}
+                      </p>
+                      <span
+                        className={`font-bold ${
+                          transaction.type === 'earn'
+                            ? 'text-green-600'
+                            : 'text-red-600'
+                        }`}
+                      >
+                        {transaction.type === 'earn' ? '+' : '-'}
+                        {Math.abs(transaction.points)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {new Date(transaction.date).toLocaleDateString('pt-BR')}
                     </p>
-                    <span
-                      className={`font-bold ${
-                        transaction.type === 'earn'
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                      }`}
-                    >
-                      {transaction.type === 'earn' ? '+' : '-'}
-                      {Math.abs(transaction.points)}
-                    </span>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    {new Date(transaction.date).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Card>
 
           {/* Quick Stats */}
@@ -262,15 +195,15 @@ export const LoyaltyPage = () => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Pontos este mês</span>
-                <span className="font-bold">+130</span>
+                <span className="font-bold">0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Resgates totais</span>
-                <span className="font-bold">-100</span>
+                <span className="font-bold">0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Taxa média/mês</span>
-                <span className="font-bold">+65</span>
+                <span className="font-bold">-</span>
               </div>
             </div>
           </Card>
