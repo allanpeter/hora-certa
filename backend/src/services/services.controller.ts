@@ -35,7 +35,7 @@ export class ServicesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new service' })
+  @ApiOperation({ summary: 'Create a new service for a shop' })
   @ApiCreatedResponse({
     description: 'Service created successfully',
     type: ServiceResponseDto,
@@ -44,45 +44,47 @@ export class ServicesController {
     @CurrentUser() user: User,
     @Body() createServiceDto: CreateServiceDto,
   ): Promise<ServiceResponseDto> {
-    return this.servicesService.createService(
-      user.id,
-      createServiceDto,
-    );
+    return this.servicesService.createService(user, createServiceDto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'List all services' })
+  @Get('tenant/:tenantId')
+  @ApiOperation({ summary: 'List all services for a shop' })
   @ApiOkResponse({
     description: 'Services retrieved successfully',
     type: [ServiceResponseDto],
   })
-  async getServices(@CurrentUser() user: User): Promise<ServiceResponseDto[]> {
-    return this.servicesService.getServices(user.id);
+  async getServices(
+    @CurrentUser() user: User,
+    @Param('tenantId') tenantId: string,
+  ): Promise<ServiceResponseDto[]> {
+    return this.servicesService.getServices(user, tenantId);
   }
 
-  @Get('active')
-  @ApiOperation({ summary: 'Get active services only' })
+  @Get('tenant/:tenantId/active')
+  @ApiOperation({ summary: 'Get active services only for a shop' })
   @ApiOkResponse({
     description: 'Active services retrieved successfully',
     type: [ServiceResponseDto],
   })
   async getActiveServices(
     @CurrentUser() user: User,
+    @Param('tenantId') tenantId: string,
   ): Promise<ServiceResponseDto[]> {
-    return this.servicesService.getActiveServices(user.id);
+    return this.servicesService.getActiveServices(user, tenantId);
   }
 
-  @Get('category/:category')
-  @ApiOperation({ summary: 'Get services by category' })
+  @Get('tenant/:tenantId/category/:category')
+  @ApiOperation({ summary: 'Get services by category for a shop' })
   @ApiOkResponse({
     description: 'Services by category retrieved successfully',
     type: [ServiceResponseDto],
   })
   async getServicesByCategory(
     @CurrentUser() user: User,
+    @Param('tenantId') tenantId: string,
     @Param('category') category: ServiceCategory,
   ): Promise<ServiceResponseDto[]> {
-    return this.servicesService.getServicesByCategory(user.id, category);
+    return this.servicesService.getServicesByCategory(user, tenantId, category);
   }
 
   @Get(':id')
@@ -95,7 +97,7 @@ export class ServicesController {
     @CurrentUser() user: User,
     @Param('id') serviceId: string,
   ): Promise<ServiceResponseDto> {
-    return this.servicesService.getServiceById(user.id, serviceId);
+    return this.servicesService.getServiceById(user, serviceId);
   }
 
   @Patch(':id')
@@ -110,11 +112,7 @@ export class ServicesController {
     @Param('id') serviceId: string,
     @Body() updateServiceDto: UpdateServiceDto,
   ): Promise<ServiceResponseDto> {
-    return this.servicesService.updateService(
-      user.id,
-      serviceId,
-      updateServiceDto,
-    );
+    return this.servicesService.updateService(user, serviceId, updateServiceDto);
   }
 
   @Patch(':id/toggle')
@@ -128,7 +126,7 @@ export class ServicesController {
     @CurrentUser() user: User,
     @Param('id') serviceId: string,
   ): Promise<ServiceResponseDto> {
-    return this.servicesService.toggleServiceStatus(user.id, serviceId);
+    return this.servicesService.toggleServiceStatus(user, serviceId);
   }
 
   @Delete(':id')
@@ -138,6 +136,6 @@ export class ServicesController {
     @CurrentUser() user: User,
     @Param('id') serviceId: string,
   ): Promise<void> {
-    await this.servicesService.deleteService(user.id, serviceId);
+    await this.servicesService.deleteService(user, serviceId);
   }
 }

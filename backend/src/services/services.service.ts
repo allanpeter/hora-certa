@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Service } from '../database/entities/service.entity';
+import { User } from '../database/entities/user.entity';
+import { TenantUser } from '../database/entities/tenant-user.entity';
 import { ServiceCategory } from '../common/enums';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -12,22 +14,39 @@ export class ServicesService {
   constructor(
     @InjectRepository(Service)
     private servicesRepository: Repository<Service>,
+    @InjectRepository(TenantUser)
+    private tenantUserRepository: Repository<TenantUser>,
   ) {}
 
+  private async verifyTenantAccess(user: User, tenantId: string): Promise<void> {
+    const tenantUser = await this.tenantUserRepository.findOne({
+      where: { user_id: user.id, tenant_id: tenantId },
+    });
+
+    if (!tenantUser) {
+      throw new BadRequestException('You do not have access to this shop');
+    }
+  }
+
   async createService(
-    tenantId: string,
+    user: User,
     createServiceDto: CreateServiceDto,
   ): Promise<ServiceResponseDto> {
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, createServiceDto.tenant_id);
+
     const service = this.servicesRepository.create({
       ...createServiceDto,
-      tenant_id: tenantId,
     });
 
     await this.servicesRepository.save(service);
     return this.mapToResponseDto(service);
   }
 
-  async getServices(tenantId: string): Promise<ServiceResponseDto[]> {
+  async getServices(user: User, tenantId: string): Promise<ServiceResponseDto[]> {
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, tenantId);
+
     const services = await this.servicesRepository.find({
       where: { tenant_id: tenantId },
       order: { created_at: 'DESC' },
@@ -36,33 +55,36 @@ export class ServicesService {
     return services.map((service) => this.mapToResponseDto(service));
   }
 
-  async getServiceById(
-    tenantId: string,
-    serviceId: string,
-  ): Promise<ServiceResponseDto> {
+  async getServiceById(user: User, serviceId: string): Promise<ServiceResponseDto> {
     const service = await this.servicesRepository.findOne({
-      where: { id: serviceId, tenant_id: tenantId },
+      where: { id: serviceId },
     });
 
     if (!service) {
       throw new NotFoundException('Service not found');
     }
+
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, service.tenant_id);
 
     return this.mapToResponseDto(service);
   }
 
   async updateService(
-    tenantId: string,
+    user: User,
     serviceId: string,
     updateServiceDto: UpdateServiceDto,
   ): Promise<ServiceResponseDto> {
     const service = await this.servicesRepository.findOne({
-      where: { id: serviceId, tenant_id: tenantId },
+      where: { id: serviceId },
     });
 
     if (!service) {
       throw new NotFoundException('Service not found');
     }
+
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, service.tenant_id);
 
     // Update only provided fields
     Object.assign(service, updateServiceDto);
@@ -71,26 +93,29 @@ export class ServicesService {
     return this.mapToResponseDto(service);
   }
 
-  async deleteService(
-    tenantId: string,
-    serviceId: string,
-  ): Promise<{ message: string }> {
+  async deleteService(user: User, serviceId: string): Promise<void> {
     const service = await this.servicesRepository.findOne({
-      where: { id: serviceId, tenant_id: tenantId },
+      where: { id: serviceId },
     });
 
     if (!service) {
       throw new NotFoundException('Service not found');
     }
 
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, service.tenant_id);
+
     await this.servicesRepository.remove(service);
-    return { message: 'Service deleted successfully' };
   }
 
   async getServicesByCategory(
+    user: User,
     tenantId: string,
     category: ServiceCategory,
   ): Promise<ServiceResponseDto[]> {
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, tenantId);
+
     const services = await this.servicesRepository.find({
       where: { tenant_id: tenantId, category },
     });
@@ -98,7 +123,10 @@ export class ServicesService {
     return services.map((service) => this.mapToResponseDto(service));
   }
 
-  async getActiveServices(tenantId: string): Promise<ServiceResponseDto[]> {
+  async getActiveServices(user: User, tenantId: string): Promise<ServiceResponseDto[]> {
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, tenantId);
+
     const services = await this.servicesRepository.find({
       where: { tenant_id: tenantId, active: true },
     });
@@ -107,16 +135,19 @@ export class ServicesService {
   }
 
   async toggleServiceStatus(
-    tenantId: string,
+    user: User,
     serviceId: string,
   ): Promise<ServiceResponseDto> {
     const service = await this.servicesRepository.findOne({
-      where: { id: serviceId, tenant_id: tenantId },
+      where: { id: serviceId },
     });
 
     if (!service) {
       throw new NotFoundException('Service not found');
     }
+
+    // Verify user has access to the tenant
+    await this.verifyTenantAccess(user, service.tenant_id);
 
     service.active = !service.active;
     await this.servicesRepository.save(service);

@@ -4,7 +4,7 @@ export class ServiceResponseDto {
   name: string;
   description?: string;
   price: number;
-  duration_minutes: number;
+  duration_minutes?: number | null;
   category: string;
   icon_url?: string;
   active: boolean;

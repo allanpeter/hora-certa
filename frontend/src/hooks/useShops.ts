@@ -167,3 +167,20 @@ export const useRemoveStaffMember = (shopId: string) => {
     },
   });
 };
+
+/**
+ * Delete a shop (soft delete, only if empty)
+ */
+export const useDeleteShop = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (shopId: string) => {
+      await api.delete(`/tenants/${shopId}`);
+    },
+    onSuccess: () => {
+      // Invalidate shops list to refresh
+      queryClient.invalidateQueries({ queryKey: ['shops'] });
+    },
+  });
+};

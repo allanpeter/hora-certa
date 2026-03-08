@@ -63,7 +63,7 @@ export class TenantsService {
   }
 
   /**
-   * Get all tenants where user is a member
+   * Get all tenants where user is a member (excluding soft-deleted)
    */
   async getMyTenants(userId: string): Promise<TenantResponseDto[]> {
     const tenantUsers = await this.tenantUserRepository.find({
@@ -71,18 +71,21 @@ export class TenantsService {
       relations: ['tenant'],
     });
 
-    return tenantUsers.map((tu) => this.formatTenantResponse(tu.tenant));
+    // Filter out soft-deleted tenants
+    return tenantUsers
+      .filter((tu) => !tu.tenant.deleted_at)
+      .map((tu) => this.formatTenantResponse(tu.tenant));
   }
 
   /**
-   * Get single tenant by ID
+   * Get single tenant by ID (excluding soft-deleted)
    */
   async getTenantById(tenantId: string): Promise<TenantResponseDto> {
     const tenant = await this.tenantRepository.findOne({
       where: { id: tenantId },
     });
 
-    if (!tenant) {
+    if (!tenant || tenant.deleted_at) {
       throw new NotFoundException(`Tenant not found`);
     }
 
@@ -90,14 +93,14 @@ export class TenantsService {
   }
 
   /**
-   * Get single tenant by slug
+   * Get single tenant by slug (excluding soft-deleted)
    */
   async getTenantBySlug(slug: string): Promise<TenantResponseDto> {
     const tenant = await this.tenantRepository.findOne({
       where: { slug },
     });
 
-    if (!tenant) {
+    if (!tenant || tenant.deleted_at) {
       throw new NotFoundException(`Tenant not found`);
     }
 
@@ -303,6 +306,37 @@ export class TenantsService {
       message: `Staff role updated to ${newRole}`,
       new_role: newRole,
     };
+  }
+
+  /**
+   * Soft delete a tenant (only if empty - only owner as member)
+   */
+  async deleteTenant(tenantId: string, currentUser: User): Promise<void> {
+    const tenant = await this.tenantRepository.findOne({
+      where: { id: tenantId },
+    });
+
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+
+    // Check if user is owner
+    if (tenant.owner_id !== currentUser.id) {
+      throw new BadRequestException('Only the shop owner can delete the shop');
+    }
+
+    // Check if shop is empty (only owner as member)
+    const staffCount = await this.tenantUserRepository.count({
+      where: { tenant_id: tenantId },
+    });
+
+    if (staffCount > 1) {
+      throw new BadRequestException('Cannot delete shop with staff members. Remove all staff first.');
+    }
+
+    // Soft delete the tenant
+    tenant.deleted_at = new Date();
+    await this.tenantRepository.save(tenant);
   }
 
   /**

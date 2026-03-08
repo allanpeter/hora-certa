@@ -7,7 +7,7 @@ export interface ReminderEmailData {
   customerName: string;
   barberName: string;
   serviceName: string;
-  serviceDuration: number;
+  serviceDuration?: number | null;
   appointmentTime: Date;
   confirmUrl: string;
   declineUrl: string;

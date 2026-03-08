@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from './stores/auth.store';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -183,7 +183,6 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // If user is already logged in, redirect to dashboard
   if (token) {

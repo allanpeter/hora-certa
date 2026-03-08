@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -53,6 +53,19 @@ export class TenantsController {
     @Body() dto: UpdateTenantDto,
   ) {
     return this.tenantsService.updateTenant(tenantId, user, dto);
+  }
+
+  @Delete(':tenantId')
+  @HttpCode(204)
+  @ApiOperation({
+    summary: 'Delete barber shop',
+    description: 'Soft delete a barber shop (owner only, shop must be empty with only owner as member)',
+  })
+  async deleteTenant(
+    @Param('tenantId') tenantId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.tenantsService.deleteTenant(tenantId, user);
   }
 
   /**

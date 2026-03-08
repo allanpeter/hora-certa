@@ -36,4 +36,7 @@ export class Tenant extends BaseEntity {
 
   @Column({ default: true })
   subscription_active: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deleted_at: Date | null;
 }

@@ -14,8 +14,8 @@ export class Service extends TenantBaseEntity {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: 'int' })
-  duration_minutes: number;
+  @Column({ type: 'int', nullable: true })
+  duration_minutes: number | null;
 
   @Column({ type: 'enum', enum: ServiceCategory })
   category: ServiceCategory;

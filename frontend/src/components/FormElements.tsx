@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, TextareaHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
+import { InputHTMLAttributes, TextareaHTMLAttributes, ButtonHTMLAttributes, ReactNode, useEffect, useState } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -262,6 +262,57 @@ export const LoadingSpinner = ({ size = 'md', text }: LoadingSpinnerProps) => {
         className={`${sizeStyles[size]} border-gray-300 border-t-blue-600 rounded-full animate-spin`}
       />
       {text && <p className="text-gray-600 text-sm">{text}</p>}
+    </div>
+  );
+};
+
+interface ToastProps {
+  message: string;
+  type?: 'success' | 'error' | 'warning' | 'info';
+  duration?: number;
+  onClose?: () => void;
+}
+
+export const Toast = ({ message, type = 'info', duration = 4000, onClose }: ToastProps) => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+      onClose?.();
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [duration, onClose]);
+
+  if (!isVisible) return null;
+
+  const styles = {
+    success: 'bg-green-500 text-white',
+    error: 'bg-red-500 text-white',
+    warning: 'bg-yellow-500 text-white',
+    info: 'bg-blue-500 text-white',
+  };
+
+  const icons = {
+    success: '✓',
+    error: '✕',
+    warning: '⚠️',
+    info: 'ℹ️',
+  };
+
+  return (
+    <div
+      className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 ${styles[type]} animate-in fade-in slide-in-from-top-2 z-50`}
+    >
+      <span className="text-lg">{icons[type]}</span>
+      <p className="text-sm font-medium">{message}</p>
+      <button
+        onClick={() => setIsVisible(false)}
+        className="ml-2 hover:opacity-70 transition"
+      >
+        ✕
+      </button>
     </div>
   );
 };

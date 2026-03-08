@@ -72,7 +72,7 @@ export class AuthService {
     const password_hash = await bcrypt.hash(signupDto.password, 10);
 
     // Clean phone number: remove formatting characters
-    const cleanPhone = signupDto.phone ? signupDto.phone.replace(/\D/g, '') : null;
+    const cleanPhone = signupDto.phone ? signupDto.phone.replace(/\D/g, '') : undefined;
 
     const user = this.userRepository.create({
       email: signupDto.email,

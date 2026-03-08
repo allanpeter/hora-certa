@@ -359,7 +359,7 @@ export class ReschedulingService {
     // Create appointment
     const slotStart = new Date(waitlist.slot_available_date);
     const slotEnd = new Date(
-      slotStart.getTime() + waitlist.service.duration_minutes * 60000,
+      slotStart.getTime() + (waitlist.service.duration_minutes || 0) * 60000,
     );
 
     const appointment = this.appointmentRepository.create({

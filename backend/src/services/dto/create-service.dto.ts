@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEnum, IsOptional, Min, MinLength } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsOptional, Min, MinLength, IsUUID } from 'class-validator';
 import { ServiceCategory } from '../../common/enums';
 
 export class CreateServiceDto {
@@ -14,9 +14,10 @@ export class CreateServiceDto {
   @Min(0)
   price: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(1)
-  duration_minutes: number;
+  duration_minutes?: number;
 
   @IsEnum(ServiceCategory)
   category: ServiceCategory;
@@ -24,4 +25,7 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString()
   icon_url?: string;
+
+  @IsUUID()
+  tenant_id: string;
 }
