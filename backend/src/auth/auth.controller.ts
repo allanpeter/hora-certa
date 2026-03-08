@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Req, Res, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../database/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { SignupDto } from './dto/signup.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,6 +17,12 @@ export class AuthController {
     private authService: AuthService,
     private configService: ConfigService,
   ) {}
+
+  @Post('signup')
+  @ApiOperation({ summary: 'Create user with email and password' })
+  async signup(@Body() signupDto: SignupDto) {
+    return this.authService.signup(signupDto);
+  }
 
   @Get('google')
   @UseGuards(GoogleAuthGuard)
